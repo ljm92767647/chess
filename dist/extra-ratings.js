@@ -1,0 +1,4 @@
+// Source-only entries without a dedicated Korean guide.
+export const extraRatings=[
+['포나이트 이탈리안','백 · e4','—','Unbreakable'],['제롬 갬빗','백 · e4','—','Unbreakable'],['폰지아니','백 · e4','—','Really, Bro'],['오랑우탄 (1.b4)','측면·시스템','—','Tricks Only'],['그롭 (1.g4)','측면·시스템','—','Tricks Only'],['봉클라우드','백 · e4','—','Garbage'],['소듐 어택 (1.Na3)','측면·시스템','—','Garbage'],['프레드 디펜스','흑 · e4','—','Garbage'],['히포포타무스','흑 · d4','—','Really, Bro'],['폴리시 디펜스','흑 · d4','—','Tricks Only'],['하이퍼 액셀러레이티드 드래곤','흑 · 시실리안','—','Garbage'],['드래곤도프','흑 · 시실리안','—','Really, Bro'],['카로칸 Nc3·g4·Nge2 변형','백 · 카로칸 대응','—','Unbreakable'],['카로칸 힐빌리 어택','백 · 카로칸 대응','—','Tricks Only'],['카로칸 어드밴스 h4 변형','백 · 카로칸 대응','—','Garbage'],['프렌치 클래시컬 (3.Nc3)','백 · 프렌치 대응','D','—'],['포르투갈 갬빗 (원문 표기)','백 · e4','—','Tricks Only'],['지우코 피아노 (흑 응수 평가)','흑 · e4','—','Tricks Only']
+].map(([name,category,cf,hk])=>({name,category,cf,hk,en:'',line:'',eco:''}));
