@@ -1,0 +1,15 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "한국어 체스 오프닝과 미들게임 전략 학습 사이트",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node scripts/verify.mjs && node scripts/review-checks.mjs"
+  }
+}
