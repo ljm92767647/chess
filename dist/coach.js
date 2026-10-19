@@ -6,6 +6,24 @@ import {lessons,position} from './lessons.js';
 const center=['d4','e4','d5','e5'];
 const names={p:'폰',n:'나이트',b:'비숍',r:'룩',q:'퀸',k:'킹'};
 const other=x=>x==='w'?'b':'w';
+export function decisionGuide(c,side,startFen){
+ const before=new Chess(startFen),f=boardFacts(c,side),old=boardFacts(before,side);
+ const pawns=x=>x.board().flat().filter(p=>p?.type==='p'&&['c','d','e'].includes(p.square[0])).map(p=>p.color+p.square).sort().join(' ');
+ const changed=pawns(c)!==pawns(before),lockChanged=f.closed.join()!==old.closed.join(),enemy=other(side);
+ const shields=x=>{const king=x.board().flat().find(p=>p?.type==='k'&&p.color===enemy);return king.square;};
+ const kingMoved=shields(c)!==shields(before);
+ const terminal=c.isGameOver();
+ const title=terminal?'종료된 국면입니다':f.kingAttacked?'지금은 체크 해소가 먼저입니다':changed?'중앙이 달라졌습니다 · 계획을 재검토하세요':f.attacked.length?'공격받는 말을 확인한 뒤 유지 여부를 결정하세요':'기존 목적을 유지할 조건부터 확인하세요';
+ const observations=[changed?'연구 시작 때와 c·d·e파일의 폰 배치가 달라졌습니다. 단순 전진인지, 교환으로 파일·약점이 바뀌었는지 확인하세요.':'연구 시작 때와 c·d·e파일의 폰 배치는 같습니다. 그래도 기물 배치와 전술까지 같다는 뜻은 아닙니다.'];
+ if(lockChanged)observations.push('d/e파일의 맞막힌 폰 상태가 바뀌었습니다. 비숍의 대각선과 나이트의 거점을 다시 확인하세요.');
+ if(f.attacked.length)observations.push(`${f.attacked.join('·')}에 상대의 직접 공격이 있습니다. 수비·되잡기·중간 체크를 비교하세요. 공격만으로 손실을 단정하지 않습니다.`);
+ if(kingMoved)observations.push('상대 킹 위치가 달라졌습니다. 기존 공격 방향과 파일 개방이 여전히 유효한지 확인하세요.');
+ return {title,observations,urgent:f.kingAttacked,terminal,options:[
+  {title:'목적 유지',when:'중앙·공격 표적이 여전히 유효하고, 원래 수를 둔 뒤 상대의 가장 강한 체크·잡기에도 손해가 없을 때.',action:'원래 개선 수나 돌파를 후보에 남깁니다. 상대가 시간을 썼다고 즉시 공격하지 말고, 더 좋은 전개 수와 비교하세요.'},
+  {title:'목적 유지 · 순서 조정',when:'표적은 남아 있지만 내 말이 쫓기거나, 중앙 수비·캐슬링·돌파 준비가 먼저 필요할 때.',action:'필요한 수비·전개를 먼저 합니다. 그 준비 뒤에도 원래 돌파가 가능한지 상대의 다음 응수까지 확인하세요.'},
+  {title:'새 계획 선택',when:'중앙 교환으로 파일이 열리거나 닫히고, 표적이 사라지거나 핵심 공격 말이 교환되어 기존 계획의 전제가 없어졌을 때.',action:'새 약한 폰·열린 파일·침투 칸을 찾기 → 가장 덜 활동적인 말 개선 → 그 구조에 맞는 돌파 선택. 중앙이 열리면 킹 안전과 전개 속도부터 재평가하세요.'}
+ ]};
+}
 export function boardFacts(c,side){const enemy=other(side),home=side==='w'?'1':'8',pieces=c.board().flat().filter(Boolean),own=pieces.filter(p=>p.color===side),king=own.find(p=>p.type==='k'),undeveloped=own.filter(p=>['n','b'].includes(p.type)&&p.square[1]===home).map(p=>p.square),centralPawns=own.filter(p=>p.type==='p'&&['c','d','e','f'].includes(p.square[0])).map(p=>p.square),control=center.filter(s=>c.isAttacked(s,side)),attacked=own.filter(p=>p.type!=='k'&&c.isAttacked(p.square,enemy)).map(p=>p.square),closed=['d','e'].filter(f=>{for(let r=2;r<=6;r++){const a=c.get(f+r),b=c.get(f+(r+1));if(a?.type==='p'&&a.color==='w'&&b?.type==='p'&&b.color==='b')return true;}return false;});return {king:king.square,kingAttacked:c.isAttacked(king.square,enemy),undeveloped,centralPawns,control,attacked,closed};}
 export function transition(history,g,reference){const expected=reference||g.line.split(' '),at=history.findIndex((m,i)=>expected[i]!==m);if(at<0)return {title:'대표 수순 안에서 진행 중',detail:'같은 수순이어도 상대의 위협을 먼저 확인하세요.'};const eligible=allGuides.filter(x=>x.id!==g.id&&history.length>=3&&history.every((m,i)=>x.line.split(' ')[i]===m));const match=eligible.sort((a,b)=>a.line.split(' ').length-b.line.split(' ').length)[0];return {title:match?'다른 갈래: '+match.name:'대표 수순과 다른 국면',detail:`${Math.floor(at/2)+1}수 ${at%2?'흑':'백'} ${history[at]}부터 달라졌습니다. ${match?'중앙과 기물의 역할을 새 갈래에 맞춰 다시 봅니다.':'정석을 벗어난 것만으로 실수는 아닙니다. 위협 → 중앙 → 전개 → 킹 안전 순서로 판단하세요.'}`,link:match&&guides.some(x=>x.id===match.id)?match.id:null};}
 export function checklist(c,g,side){const f=boardFacts(c,side);const legal=c.moves({verbose:true}),captures=legal.filter(m=>m.captured).map(m=>m.san),turn=c.turn()===side?'내':'상대';return [
