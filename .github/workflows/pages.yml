@@ -22,6 +22,8 @@ jobs:
         run: |
           node scripts/verify.mjs
           node scripts/review-checks.mjs
+          node scripts/learning-checks.mjs
+          node scripts/engine-checks.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

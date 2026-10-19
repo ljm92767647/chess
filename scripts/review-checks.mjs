@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {guides} from '../dist/guides.js';
+import {guides} from '../dist/catalog.js';
 import {lessons,position,pawnFacts,moves,moveReason} from '../dist/lessons.js';
 const distinct=new Set();let placements=0,notes=0;
 for(const g of guides){const l=lessons[g.id];assert(l,g.id);assert(l.summary&&l.preferences.length&&l.scope);for(const c of l.cases){let p=position(c.line);distinct.add(p.fen());placements++;for(const field of ['purpose','structure'])assert(c[field]?.length>20,g.id+' '+field);for(const field of ['ideas','pieces','targets','counters'])assert(c[field]?.length>=2,g.id+' '+field);assert(c.plans.length===2&&c.plans.every(a=>a.length===7&&a.every(Boolean)),g.id+' plans');for(let step=1;step<=moves(c.line).length;step++){const n=moveReason(c.line,step);assert(n.why&&n.threat&&n.ignore);notes++;}}}

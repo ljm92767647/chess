@@ -1,0 +1,25 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {spawn} from 'node:child_process';
+import assert from 'node:assert/strict';
+import {fileURLToPath} from 'node:url';
+import {Chess} from '../dist/chess.js';
+import {parseInfo,collectResult} from '../dist/uci.js';
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'chess-engine-check-'));
+const base='stockfish-19-lite-single';
+for(const ext of ['js','wasm'])fs.copyFileSync(fileURLToPath(new URL('../dist/engine/'+base+'.'+ext,import.meta.url)),path.join(root,base+'.'+ext));
+fs.writeFileSync(path.join(root,'package.json'),'{"type":"commonjs"}');
+const c=new Chess();for(const m of ['e4','e5','Nf3','Nf6'])c.move(m);
+const fixtures=[['initial',new Chess().fen()],['petrov',c.fen()],['mate','7k/5K2/6Q1/8/8/8/8/8 w - - 0 1'],['check','4k3/8/8/8/8/8/4r3/4K3 w - - 0 1'],['castle','r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1'],['promotion','7k/P7/8/8/8/8/8/K7 w - - 0 1']];
+const child=spawn(process.execPath,[path.join(root,base+'.js')],{stdio:['pipe','pipe','pipe'],windowsHide:true});
+let buffer='',index=-1,groups=new Map();const results=[];const send=s=>child.stdin.write(s+'\n');
+await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{child.kill();reject(Error('Engine test timed out'));},25000);child.on('error',reject);child.stderr.on('data',b=>{if(String(b).includes('Error')){clearTimeout(timer);child.kill();reject(Error('Engine startup failure'));}});
+ const next=()=>{index++;if(index===fixtures.length){clearTimeout(timer);send('quit');resolve();return;}groups=new Map();send('position fen '+fixtures[index][1]);send('go depth 8 movetime 250');};
+ child.stdout.on('data',chunk=>{buffer+=chunk.toString();const lines=buffer.split('\n');buffer=lines.pop();for(const l of lines){try{if(l.trim()==='uciok'){send('setoption name MultiPV value 3');send('isready');}else if(l.trim()==='readyok')next();else if(l.startsWith('info ')){const i=parseInfo(l);if(i){if(!groups.has(i.depth))groups.set(i.depth,new Map());groups.get(i.depth).set(i.rank,i);}}else if(l.startsWith('bestmove ')){const [name,fen]=fixtures[index],r=collectResult(fen,groups,Math.min(3,new Chess(fen).moves().length),l.split(' ')[1]);assert(r.candidates.length&&r.depth>0,name);for(const x of r.candidates){const test=new Chess(fen);for(const san of x.pv)assert(test.move(san));}if(name==='mate')assert(r.candidates[0].san.includes('#'));results.push({name,depth:r.depth,pvs:r.candidates.map(x=>x.pv)});next();}}catch(e){clearTimeout(timer);child.kill();reject(e);}}});send('uci');});
+await new Promise(resolve=>child.once('exit',resolve));
+fs.mkdirSync('outputs',{recursive:true});fs.writeFileSync('outputs/engine-validation.json',JSON.stringify({engine:'Stockfish 19 lite',fixtures:results,failures:[]},null,2));console.log(JSON.stringify({engine:'Stockfish 19 lite',fixtures:results.length,failures:[]}));
+// Only this script's newly created temporary directory is removed.
+const resolved=fs.realpathSync(root),tempRoot=fs.realpathSync(os.tmpdir());
+assert.equal(path.dirname(resolved),tempRoot);assert(path.basename(resolved).startsWith('chess-engine-check-'));
+fs.rmSync(resolved,{recursive:true,force:true});
