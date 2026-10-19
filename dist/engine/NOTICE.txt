@@ -1,0 +1,6 @@
+Stockfish.js 19.0.1, lite single-threaded WebAssembly build
+Copyright Stockfish contributors and Nathan Rugg. GPL-3.0; see Copying.txt.
+Unmodified upstream engine binaries.
+Corresponding source: https://github.com/nmrugg/stockfish.js/tree/v19.0.1
+Source archive: https://github.com/nmrugg/stockfish.js/archive/refs/tags/v19.0.1.zip
+Build instructions: https://github.com/nmrugg/stockfish.js/blob/v19.0.1/README.md
