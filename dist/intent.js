@@ -1,5 +1,5 @@
 import {Chess} from './chess.js';
-import {boardFacts,explainCandidate} from './coach.js?v=20261020-intent3';
+import {boardFacts,explainCandidate} from './coach.js?v=20261020-simple';
 import {lessons} from './lessons.js';
 const names={p:'폰',n:'나이트',b:'비숍',r:'룩',q:'퀸',k:'킹'};
 const other=s=>s==='w'?'b':'w';
