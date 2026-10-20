@@ -1,4 +1,4 @@
-import {collectResult,toCandidate} from './uci.js?v=20261020-compare';
+import {collectResult,toCandidate} from './uci.js?v=20261020-compare2';
 const merit=x=>x.scoreKind==='mate'?(x.score>0?100000-x.score:-100000-x.score):Math.max(-99000,Math.min(99000,x.score));
 export function scoreText(x){if(!x||!(x.depth>0))return '평가 미확정';return x.scoreKind==='mate'?(x.score>0?`상대 메이트까지 ${x.score}수`:`내 메이트까지 ${-x.score}수`):`${x.score>=0?'+':''}${(x.score/100).toFixed(2)}`;}
 export function comparePlan(candidates,planSan,depth){
@@ -29,6 +29,8 @@ export function mergePlanSearch(fen,mainGroups,planGroups,expected,bestmove,plan
 }
 export function assessedPlan(d,result,side,explain){
  const pending={...d,checked:false,selected:'pending',verdict:d.kind==='end'?d.verdict:'전략 초안 · 계산 전',because:`목표 초안: ${d.route.goal}. 이번 수는 아직 계산으로 확인하지 않았습니다.`,theoryReason:d.because,first:d.example?`이론 예시 ${d.example}는 아직 이 국면에서 검증하지 않았습니다. 수 계산으로 비교하세요.`:'장기 목표의 초안입니다. 이번에 둘 수는 계산한 뒤 선택하세요.',example:null,comparisonText:'',originalExample:d.example};
+ if(d.kind==='respond'){pending.verdict=d.verdict==='체크 해소 먼저'?'체크 해소 필수 · 대응 수 계산 전':'위협 확인 먼저 · 대응 수 계산 전';pending.because=d.because;pending.first='원래 전개를 두기 전에 수비·이동·반격 후보를 계산하세요.';}
+ if(d.turn&&d.turn!==side){pending.verdict='상대 차례 · 다음 응수 확인';pending.first='상대 수를 선택하거나 계산하세요. 내 수의 검증은 상대 응수 뒤 진행합니다.';}
  if(d.kind==='end')return {...d,checked:true};
  if(!result?.candidates?.length)return pending;
  const best=result.candidates[0],cmp=result.comparison||{status:'incomplete'},ownTurn=result.fen.split(' ')[1]===side;

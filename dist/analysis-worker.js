@@ -1,5 +1,5 @@
-import {replay,parseInfo,collectResult} from './uci.js?v=20261020-compare';
-import {mergePlanSearch} from './plan-analysis.js?v=20261020-compare';
+import {replay,parseInfo,collectResult} from './uci.js?v=20261020-compare2';
+import {mergePlanSearch} from './plan-analysis.js?v=20261020-compare2';
 let engine=null,watchdog=null;
 self.onmessage=({data})=>{
  let finished=false;

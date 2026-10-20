@@ -1,7 +1,7 @@
 import {guides as allGuides} from './guides.js';
 import {lessons,position,moves} from './lessons.js';
 import {openingRoadmap} from './roadmap.js';
-import {explainCandidate} from './coach.js?v=20261020-compare';
+import {explainCandidate} from './coach.js?v=20261020-compare2';
 const enemy=s=>s==='w'?'b':'w';
 const pawnKey=c=>c.board().flat().filter(p=>p?.type==='p'&&'cde'.includes(p.square[0])).map(p=>p.color+p.square).sort().join();
 const value={p:1,n:3,b:3,r:5,q:9,k:100};
@@ -33,5 +33,5 @@ export function choosePlan(c,g,side,studyCase=lessons[g.id].cases[0],reference=m
  if(example&&kind!=='end'&&kind!=='respond'&&c.turn()===side)first=`${example}를 후보로 봅니다. ${explainCandidate(c.fen(),example,nextGuide,side).text}`;
  if(c.turn()!==side&&kind!=='end')first='지금은 상대 차례입니다. 다음 내 차례에는 '+first;
  if(nextGuide.id==='italian'&&side==='w'&&route.steps[0].includes('e3 방향으로 전개')&&!because.includes('g5'))because+=' g5는 흑 폰이 공격하므로 비숍은 e3 방향으로 전개합니다. d4 목표는 유지합니다.';
- return {kind,selected,verdict,because,first,example,route,preparing:history.length<path.length,planName:nextGuide.name+(nextCase===lessons[nextGuide.id].cases[0]?'':' · '+nextCase.label),newGuide:nextGuide.id!==g.id?nextGuide:null,note:'현재 배치와 알려진 갈래에 따른 학습용 우선순위입니다. 전술적 최선 수는 후보 계산으로 확인하세요.'};
+ return {kind,selected,verdict,because,first,example,route,turn:c.turn(),preparing:history.length<path.length,planName:nextGuide.name+(nextCase===lessons[nextGuide.id].cases[0]?'':' · '+nextCase.label),newGuide:nextGuide.id!==g.id?nextGuide:null,note:'현재 배치와 알려진 갈래에 따른 학습용 우선순위입니다. 전술적 최선 수는 후보 계산으로 확인하세요.'};
 }

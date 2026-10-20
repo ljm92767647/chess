@@ -74,6 +74,9 @@ const worse=comparePlan([safeBest,badPlan],'a3',12);assert.equal(worse.category,
 assert(assessedPlan(basePlan,{...compared,comparison:worse},'w',()=> '').verdict.includes('보류'));
 assert.equal(assessedPlan(basePlan,{...compared,depth:6},'w',()=> '').checked,false);
 assert(assessedPlan(basePlan,compared,'b',()=> '').verdict.includes('상대 후보'));
+const checkDraft=assessedPlan(choosePlan(checking,italian,'w'),null,'w',()=> '');
+assert(checkDraft.verdict.includes('체크 해소 필수'));assert.equal(checkDraft.checked,false);
+const opponentDraft=assessedPlan({...basePlan,turn:'b'},null,'w',()=> '');assert(opponentDraft.verdict.includes('상대 차례'));assert.equal(opponentDraft.example,null);
 const mateLoss={...badPlan,scoreKind:'mate',score:-3};assert.equal(comparePlan([safeBest,mateLoss],'a3',12).category,'hold');
 const research=new ResearchLine(new Chess().fen());
 research.append('e4');research.append('e5');research.append('Nf3');
