@@ -6,6 +6,8 @@ import {guides,removed,isIncluded} from '../dist/catalog.js';
 import {purposes,directions,profile} from '../dist/purposes.js';
 import {boardFacts,transition,checklist,explainCandidate,decisionGuide} from '../dist/coach.js';
 import {ResearchLine} from '../dist/research.js';
+import {moveInsight,responseAdvice} from '../dist/intent.js';
+import {lessons} from '../dist/lessons.js';
 import {replay,parseInfo,toCandidate,collectResult} from '../dist/uci.js';
 assert.equal(guides.length,49);assert.equal(removed.length,25);
 assert(!isIncluded({cf:'C',hk:'—'}));assert(!isIncluded({cf:'—',hk:'Tricks Only'}));assert(!isIncluded({cf:'D',hk:'Really, Bro'}));assert(!isIncluded({cf:'—',hk:'—'}));
@@ -56,5 +58,32 @@ assert(decisionGuide(quiet,'w',start.fen()).observations[0].includes('같습니�
 const central=new Chess();central.move('e4');assert(decisionGuide(central,'w',start.fen()).title.includes('중앙이 달라졌습니다'));
 const check=new Chess('4k3/8/8/8/8/8/4r3/4K3 w - - 0 1');assert(decisionGuide(check,'w',check.fen()).urgent);
 assert.equal(decisionGuide(quiet,'w',start.fen()).options.length,3);
-fs.mkdirSync('outputs',{recursive:true});fs.writeFileSync('outputs/learning-validation.json',JSON.stringify({kept:guides.length,excluded:removed.length,uciAndPolicyChecks:true,researchNavigationAndDecisionChecks:true,failures:[]},null,2));
-console.log(JSON.stringify({kept:guides.length,excluded:removed.length,uciAndPolicyChecks:true,researchNavigationAndDecisionChecks:true,failures:[]},null,2));
+let explained=0;
+for(const g of guides)for(const studyCase of lessons[g.id].cases){
+ const position=new Chess();
+ for(const san of studyCase.line.split(' ')){
+  const move=position.move(san);
+  for(const side of ['w','b']){
+   const insight=moveInsight(move,g,side,studyCase),advice=responseAdvice(position,g,side,studyCase);
+   assert(insight.why&&insight.relation&&insight.next&&advice.action,g.id+' '+san);
+   assert.equal(insight.own,move.color===side);
+  }
+  explained++;
+ }
+}
+const tactical=new Chess();for(const san of ['e4','e5','Nf3','Nf6'])tactical.move(san);
+assert(responseAdvice(tactical,italian,'w').title.includes('e4 폰'));
+assert.equal(moveInsight(tactical.history({verbose:true}).at(-1),italian,'w').kind,'keep','ordinary development is not a plan change');
+const trade=new Chess();for(const san of ['e4','e5','Nf3','Nc6','d4','exd4'])trade.move(san);
+assert.equal(moveInsight(trade.history({verbose:true}).at(-1),italian,'w').kind,'review');
+assert(responseAdvice(trade,italian,'w').status.includes('표적이 남으면 유지'));
+assert.equal(moveInsight(castle.game().history({verbose:true}).at(-1),italian,'w').kind,'keep');
+const fool=new Chess();for(const san of ['f3','e5','g4','Qh4#'])fool.move(san);
+assert.equal(moveInsight(fool.history({verbose:true}).at(-1),italian,'w').kind,'finish');
+assert.equal(responseAdvice(fool,italian,'w').status,'수순 종료');
+const blackMove=trade.history({verbose:true}).at(-1);assert(moveInsight(blackMove,italian,'w').title.startsWith('3수 흑'));
+assert(explainCandidate(ep.start,'exd6',italian,'w').text.includes('d5의 폰'));
+assert(explainCandidate('7k/P7/8/8/8/8/8/K7 w - - 0 1','a8=Q+',italian,'w').text.includes('승진'));
+console.log(JSON.stringify({moveIntentChecks:explained,replyChecks:true}));
+fs.mkdirSync('outputs',{recursive:true});fs.writeFileSync('outputs/learning-validation.json',JSON.stringify({kept:guides.length,excluded:removed.length,uciAndPolicyChecks:true,researchNavigationAndDecisionChecks:true,moveIntentChecks:explained,replyChecks:true,failures:[]},null,2));
+console.log(JSON.stringify({kept:guides.length,excluded:removed.length,uciAndPolicyChecks:true,researchNavigationAndDecisionChecks:true,moveIntentChecks:explained,replyChecks:true,failures:[]},null,2));

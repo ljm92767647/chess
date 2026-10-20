@@ -35,7 +35,8 @@ export function checklist(c,g,side){const f=boardFacts(c,side);const legal=c.mov
  ].map(x=>({...x,focus:profile(g).focus.includes(x.id)}));}
 export function explainCandidate(fen,san,g,side){const c=new Chess(fen),moving=c.turn(),before=boardFacts(c,moving),m=c.move(san),after=boardFacts(c,moving),parts=[],ties=[];const focus=profile(g).focus;
  if(m.flags.includes('k')||m.flags.includes('q')){parts.push('킹을 옮기고 룩을 중앙 쪽으로 연결합니다.');ties.push('king','develop');}
- if(m.captured){parts.push(`${m.to}의 ${names[m.captured]}${['n','q'].includes(m.captured)?'를':'을'} 잡습니다. 되잡힌 뒤의 재료와 열린 선을 비교합니다.`);ties.push('structure');if(center.includes(m.to))ties.push('center');}
+ if(m.promotion)parts.push(`폰을 ${m.to}에서 ${names[m.promotion]}으로 승진시킵니다.`);
+ if(m.captured){const capturedSquare=m.flags.includes('e')?m.to[0]+m.from[1]:m.to;parts.push(`${capturedSquare}의 ${names[m.captured]}${['n','q'].includes(m.captured)?'를':'을'} 잡습니다. 되잡힌 뒤의 재료와 열린 선을 비교합니다.`);ties.push('structure');if(center.includes(m.to))ties.push('center');}
  if(m.san.includes('#'))parts.push('체크메이트입니다.');else if(m.san.includes('+'))parts.push('체크로 상대의 대응을 제한합니다.');
  if(['n','b'].includes(m.piece)&&before.undeveloped.includes(m.from)){parts.push(`${names[m.piece]}${m.piece==='n'?'를':'을'} ${m.to}로 전개합니다.`);ties.push('develop');}
  const gained=after.control.filter(s=>!before.control.includes(s));if(gained.length){parts.push(`${gained.join('·')}에 통제·수비를 추가합니다.`);ties.push('center','restrict');}
