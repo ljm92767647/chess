@@ -8,12 +8,30 @@ import {boardFacts,transition,checklist,explainCandidate,decisionGuide} from '..
 import {ResearchLine} from '../dist/research.js';
 import {moveInsight,responseAdvice} from '../dist/intent.js';
 import {lessons} from '../dist/lessons.js';
+import {openingRoadmap,roadmapIds} from '../dist/roadmap.js';
+import {choosePlan} from '../dist/plan-choice.js';
 import {replay,parseInfo,toCandidate,collectResult} from '../dist/uci.js';
 assert.equal(guides.length,49);assert.equal(removed.length,25);
 assert(!isIncluded({cf:'C',hk:'—'}));assert(!isIncluded({cf:'—',hk:'Tricks Only'}));assert(!isIncluded({cf:'D',hk:'Really, Bro'}));assert(!isIncluded({cf:'—',hk:'—'}));
 assert(isIncluded({cf:'C',hk:'Unbreakable'}));assert(isIncluded({cf:'S',hk:'Garbage'}));assert(isIncluded({cf:'—',hk:'Legit'}));
 for(const g of guides){const p=profile(g);assert(p.focus.length>=2&&p.focus.every(id=>purposes.some(x=>x[0]===id)),g.id);assert(p.paths.length&&p.paths.every(id=>directions.some(x=>x[0]===id)),g.id);}
 const italian=guides.find(g=>g.id==='italian');
+assert(guides.every(g=>roadmapIds.includes(g.id)),'every public opening has its own benefit and route');
+for(const g of guides){const r=openingRoadmap(g);assert(r.gain&&r.goal&&r.steps.length===3,g.id);}
+const continuation=new Chess();for(const san of ['e4','e5','Nf3','Nc6'])continuation.move(san);
+assert.equal(choosePlan(continuation,italian,'w').kind,'continue');
+continuation.undo();continuation.move('Nf6');
+const petrovChoice=choosePlan(continuation,italian,'w');
+assert.equal(petrovChoice.kind,'switch');assert.equal(petrovChoice.newGuide.id,'petrov');assert.equal(petrovChoice.example,'Nxe5');
+const quietDeviation=new Chess();for(const san of ['e4','e5','Nf3','Nc6','Bc4','h6'])quietDeviation.move(san);
+assert.equal(choosePlan(quietDeviation,italian,'w').kind,'continue');
+const threatened=new Chess('4k3/8/8/8/1p6/2N5/8/4K3 w - - 0 1');
+assert.equal(choosePlan(threatened,italian,'w').kind,'respond');
+const checking=new Chess('4k3/8/8/8/8/8/4r3/4K3 w - - 0 1');
+assert.equal(choosePlan(checking,italian,'w').verdict,'체크 해소 먼저');
+const frenchGuide=guides.find(g=>g.id==='french'),exchange=new Chess();for(const san of ['e4','e6','d4','d5','exd5'])exchange.move(san);
+assert.equal(choosePlan(exchange,frenchGuide,'b').kind,'switch');assert.equal(choosePlan(exchange,frenchGuide,'b').newGuide.id,'french-exchange');
+assert(openingRoadmap(frenchGuide).gain.includes('c8'));
 assert.equal(transition(['e4','e5','Nf3','Nf6'],italian).title,'다른 갈래: 페트로프 디펜스');
 assert.equal(transition(['e4','e5','Nf3'],italian).title,'대표 수순 안에서 진행 중');
 assert.equal(transition(['e4','e5','Nf3','Nc6','Bc4','h6'],italian).title,'대표 수순과 다른 국면');
