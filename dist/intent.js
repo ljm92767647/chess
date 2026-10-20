@@ -1,5 +1,5 @@
 import {Chess} from './chess.js';
-import {boardFacts,explainCandidate} from './coach.js?v=20261020-intent2';
+import {boardFacts,explainCandidate} from './coach.js?v=20261020-intent3';
 import {lessons} from './lessons.js';
 const names={p:'폰',n:'나이트',b:'비숍',r:'룩',q:'퀸',k:'킹'};
 const other=s=>s==='w'?'b':'w';
@@ -37,7 +37,7 @@ export function responseAdvice(c,g,side,studyCase=lessons[g.id].cases[0]){
  let title='전개를 이어가며 상대의 중앙 반격을 확인하세요',status='기존 목적을 이어갈 후보',action=`먼저 ${plans[1]}. 이후 ${plans[2]}를 준비하며 ${plans[3]}을 목표로 합니다.`,reason=m?insight.why:'아직 확인할 상대 수가 없습니다. 원하는 상대 수를 두면 그 수의 효과와 대응을 보여줍니다.';
  if(c.isGameOver()){title='대국이 끝났습니다';status='수순 종료';action='앞으로 더 둘 수 없습니다. 이전 수로 돌아가 다른 대응을 비교하세요.';}
  else if(f.kingAttacked){title='지금은 내 킹의 체크부터 막아야 합니다';status='수비 먼저 → 원래 계획은 그 다음';action='킹 이동·체크 기물 잡기·공격선 차단 중 합법 수를 비교하세요. 체크를 무시하고 원래 수순을 둘 수 없습니다.';}
- else if(fresh.length){title=`상대가 ${fresh.slice(0,2).map(label).join('·')}을 새로 압박했습니다`;status='대응 순서 조정 · 표적은 아직 유지 가능';const captures=c.turn()===side?c.moves({verbose:true}).filter(x=>x.captured).map(x=>x.san).slice(0,3):[];action='수비 추가·말 이동·공격 말 교환과 상대 중앙에 대한 반격을 비교하세요. '+(captures.length?`지금 가능한 잡기 ${captures.join('·')}도 후보이며 후속 되잡기까지 계산합니다. `:'')+'공격받는다는 이유만으로 곧 잃는 것은 아니므로 원래 전개를 계속할 수도 있습니다.';}
+ else if(fresh.length){title=`상대의 새 압박 대상: ${fresh.slice(0,2).map(label).join('·')}`;status='대응 순서 조정 · 표적은 아직 유지 가능';const captures=c.turn()===side?c.moves({verbose:true}).filter(x=>x.captured).map(x=>x.san).slice(0,3):[];action='수비 추가·말 이동·공격 말 교환과 상대 중앙에 대한 반격을 비교하세요. '+(captures.length?`지금 가능한 잡기 ${captures.join('·')}도 후보이며 후속 되잡기까지 계산합니다. `:'')+'공격받는다는 이유만으로 곧 잃는 것은 아니므로 원래 전개를 계속할 수도 있습니다.';}
  else if(insight?.kind==='review'){title=`상대가 ${m.to}에서 교환했습니다 · 남은 말과 표적을 확인하세요`;status='표적이 남으면 유지 · 사라졌으면 계획 전환';action=insight.next;}
  else if((m&&(m.flags.includes('k')||m.flags.includes('q')))){title='상대가 캐슬링했습니다 · 공격 방향을 다시 확인하세요';status='목적 유지 가능 · 공격 표적 위치 확인';action='상대 킹이 옮겨간 쪽의 약점과 내 킹 안전을 비교하세요. 공격 준비가 부족하면 말 전개와 중앙 수비를 먼저 합니다.';}
  else if(m?.piece==='p'&&['c','d','e'].includes(m.to[0])){title=`상대가 ${m.to}에 폰을 뒀습니다 · 중앙을 지킬지 교환할지 비교하세요`;status='중앙 대응 확인 → 기존 전개 계속';action='중앙 폰의 전진·교환·유지 뒤 상대의 가장 강한 응수를 비교하세요. 기존 돌파와 표적이 여전히 유효하면 계획을 이어가고, 교환으로 없어지면 새 파일을 활용합니다.';}
