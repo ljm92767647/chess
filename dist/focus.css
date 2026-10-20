@@ -21,4 +21,5 @@ header{height:64px;padding:0 24px;gap:16px}header #menu{display:inline-flex;alig
 /* Balance the picker in the space below the purpose strip. */
 @media(min-width:701px){.home-view #page{min-height:calc(100dvh - 64px);display:flex;flex-direction:column}.home-view #purpose-banner{flex:none}.home-view #main{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}.home-view .opening-carousel{width:100%}}
 @media(max-width:700px){.home-view .carousel-header{height:66px;justify-content:flex-start;padding-top:0}.home-view .carousel-header h1{font-size:clamp(17px,5vw,20px);line-height:1.2}.home-view .purpose-box{margin-bottom:3px}}
-@media(min-width:701px){.home-view #carousel-category{transform:translateY(-4px)}}
+
+@media(min-width:701px){.home-view .opening-carousel{transform:translateY(-16px)}}
