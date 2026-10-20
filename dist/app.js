@@ -4,9 +4,9 @@ import {guides,removed,ratingPolicy} from './catalog.js';
 import {lessons,moveReason} from './lessons.js';
 import {mountPurpose,profile} from './purposes.js';
 import {mountLearning,strategyCompare,sourceNotes} from './learning.js';
-import {moveInsight,responseAdvice} from './intent.js?v=20261020-intent';
+import {moveInsight,responseAdvice} from './intent.js?v=20261020-intent2';
 import {ResearchLine} from './research.js';
-import {checklist,transition,explainCandidate,decisionGuide} from './coach.js?v=20261020-intent';
+import {checklist,transition,explainCandidate,decisionGuide} from './coach.js?v=20261020-intent2';
 
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tokens=s=>s.replace(/\d+\.(\.\.)?/g,'').trim().split(/\s+/).filter(Boolean);

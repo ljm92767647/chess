@@ -74,6 +74,9 @@ for(const g of guides)for(const studyCase of lessons[g.id].cases){
 const tactical=new Chess();for(const san of ['e4','e5','Nf3','Nf6'])tactical.move(san);
 assert(responseAdvice(tactical,italian,'w').title.includes('e4 폰'));
 assert.equal(moveInsight(tactical.history({verbose:true}).at(-1),italian,'w').kind,'keep','ordinary development is not a plan change');
+tactical.move('Nxe5');tactical.move('d6');
+assert(!moveInsight(tactical.history({verbose:true}).at(-1),italian,'w').relation.includes('공격받던 말을 옮기'));
+assert(moveInsight(tactical.history({verbose:true}).at(-1),italian,'w').relation.includes('상대 말을 압박'));
 const trade=new Chess();for(const san of ['e4','e5','Nf3','Nc6','d4','exd4'])trade.move(san);
 assert.equal(moveInsight(trade.history({verbose:true}).at(-1),italian,'w').kind,'review');
 assert(responseAdvice(trade,italian,'w').status.includes('표적이 남으면 유지'));
