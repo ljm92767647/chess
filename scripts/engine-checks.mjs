@@ -23,3 +23,4 @@ fs.mkdirSync('outputs',{recursive:true});fs.writeFileSync('outputs/engine-valida
 const resolved=fs.realpathSync(root),tempRoot=fs.realpathSync(os.tmpdir());
 assert.equal(path.dirname(resolved),tempRoot);assert(path.basename(resolved).startsWith('chess-engine-check-'));
 fs.rmSync(resolved,{recursive:true,force:true});
+await import('./engine-comparison-checks.mjs');

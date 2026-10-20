@@ -1,7 +1,7 @@
 import {guides as allGuides} from './guides.js';
 import {lessons,position,moves} from './lessons.js';
 import {openingRoadmap} from './roadmap.js';
-import {explainCandidate} from './coach.js?v=20261020-roadmap2';
+import {explainCandidate} from './coach.js?v=20261020-compare';
 const enemy=s=>s==='w'?'b':'w';
 const pawnKey=c=>c.board().flat().filter(p=>p?.type==='p'&&'cde'.includes(p.square[0])).map(p=>p.color+p.square).sort().join();
 const value={p:1,n:3,b:3,r:5,q:9,k:100};
