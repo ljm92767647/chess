@@ -1,5 +1,5 @@
 import {openingRoadmap} from './roadmap.js';
-import {profile} from './purposes.js?v=20261020-compact1';
+import {profile} from './purposes.js?v=20261020-carousel1';
 import {lessons,position,pawnFacts,theorySources} from './lessons.js';
 import {guides,ratingPolicy} from './catalog.js';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
