@@ -1,6 +1,6 @@
 import {Chess} from './chess.js';
 import {guides} from './catalog.js';
-import {profile} from './purposes.js?v=20261020-carousel2';
+import {profile} from './purposes.js?v=20261020-thin1';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let selectedIndex=0;
 export function mountHome(onSelect){
